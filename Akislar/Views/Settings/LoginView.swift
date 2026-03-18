@@ -171,7 +171,7 @@ struct LoginView: View {
                     }
                 }
             }
-            .onChange(of: authService.isSignedIn) { _, isSignedIn in
+            .onChange(of: authService.isSignedIn) { isSignedIn in
                 if isSignedIn { dismiss() }
             }
         }
