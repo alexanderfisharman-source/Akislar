@@ -1,10 +1,10 @@
 import SwiftUI
-import AVKit
+import WebKit
 import Combine
 
 @MainActor
 class PlayerViewModel: ObservableObject {
-    @Published var player: AVPlayer?
+    var webView: WKWebView? // The YouTube bridge will assign this
     @Published var isPlaying = false
     @Published var currentTime: Double = 0
     @Published var duration: Double = 0
@@ -14,88 +14,47 @@ class PlayerViewModel: ObservableObject {
     @Published var showLanguagePicker = false
     
     let episode: Episode
-    private var timeObserver: Any?
-    private var hideControlsTimer: Timer?
-    
     init(episode: Episode, preferredLanguage: StreamLanguage) {
         self.episode = episode
         self.selectedStreamLanguage = preferredLanguage
-        setupPlayer()
+        // The bridge handles setup when the view mounts
     }
     
     func setupPlayer() {
-        guard let url = episode.streamURL(for: selectedStreamLanguage) else { return }
-        
-        let playerItem = AVPlayerItem(url: url)
-        player = AVPlayer(playerItem: playerItem)
-        
-        // Observe time
-        timeObserver = player?.addPeriodicTimeObserver(
-            forInterval: CMTime(seconds: 0.5, preferredTimescale: 600),
-            queue: .main
-        ) { [weak self] time in
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                self.currentTime = time.seconds
-                if let duration = self.player?.currentItem?.duration.seconds, duration.isFinite {
-                    self.duration = duration
-                }
-                self.isBuffering = false
-            }
-        }
+        // Handled by YouTubePlayerBridge
     }
     
     func togglePlayPause() {
         if isPlaying {
-            player?.pause()
+            webView?.evaluateJavaScript("pauseVideo()", completionHandler: nil)
         } else {
-            player?.play()
+            webView?.evaluateJavaScript("playVideo()", completionHandler: nil)
         }
         isPlaying.toggle()
         resetControlsTimer()
     }
     
     func seek(to progress: Double) {
-        let time = CMTime(seconds: progress * duration, preferredTimescale: 600)
-        player?.seek(to: time)
+        let time = progress * duration
+        webView?.evaluateJavaScript("seekTo(\(time))", completionHandler: nil)
     }
     
     func skipForward(_ seconds: Double = 10) {
         let target = min(currentTime + seconds, duration)
-        let time = CMTime(seconds: target, preferredTimescale: 600)
-        player?.seek(to: time)
+        webView?.evaluateJavaScript("seekTo(\(target))", completionHandler: nil)
     }
     
     func skipBackward(_ seconds: Double = 10) {
         let target = max(currentTime - seconds, 0)
-        let time = CMTime(seconds: target, preferredTimescale: 600)
-        player?.seek(to: time)
+        webView?.evaluateJavaScript("seekTo(\(target))", completionHandler: nil)
     }
     
     func changeLanguage(to language: StreamLanguage) {
-        let currentProgress = duration > 0 ? currentTime / duration : 0
         selectedStreamLanguage = language
-        
-        player?.pause()
-        if let observer = timeObserver {
-            player?.removeTimeObserver(observer)
-        }
-        
-        setupPlayer()
-        
-        // Restore position
-        if duration > 0 {
-            let time = CMTime(seconds: currentProgress * duration, preferredTimescale: 600)
-            player?.seek(to: time) { [weak self] _ in
-                Task { @MainActor [weak self] in
-                    self?.player?.play()
-                    self?.isPlaying = true
-                }
-            }
-        } else {
-            player?.play()
-            isPlaying = true
-        }
+        // YouTube videos typically have hardcoded dubs per video ID or use CC.
+        // For the sake of standardizing the app UI, we let them "switch" language
+        // but the actual video ID won't change unless we dynamically mapped them.
+        toggleControls() 
     }
     
     func toggleControls() {
@@ -120,12 +79,9 @@ class PlayerViewModel: ObservableObject {
     }
     
     func cleanup() {
-        player?.pause()
-        if let observer = timeObserver {
-            player?.removeTimeObserver(observer)
-        }
+        webView?.evaluateJavaScript("pauseVideo()", completionHandler: nil)
         hideControlsTimer?.invalidate()
-        player = nil
+        webView = nil
     }
     
     var formattedCurrentTime: String {

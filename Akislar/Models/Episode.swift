@@ -10,6 +10,7 @@ struct Episode: Identifiable, Codable, Hashable {
     let duration: String
     let thumbnailURL: String
     let streamURLs: [String: String] // key: language code, value: stream URL
+    let youtubeVideoId: String? // Real YouTube Video ID
     
     var thumbnailImage: URL? { URL(string: thumbnailURL) }
     

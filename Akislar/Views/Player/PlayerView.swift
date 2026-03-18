@@ -20,13 +20,12 @@ struct PlayerView: View {
             Color.black.ignoresSafeArea()
             
             // Video layer
-            if let player = viewModel.player {
-                VideoPlayer(player: player)
+            if let videoId = viewModel.episode.youtubeVideoId {
+                YouTubePlayerBridge(viewModel: viewModel, videoId: videoId)
                     .ignoresSafeArea()
-                    .onAppear {
-                        player.play()
-                        viewModel.isPlaying = true
-                    }
+            } else {
+                Text("Content not found")
+                    .foregroundColor(.white)
             }
             
             // Controls overlay

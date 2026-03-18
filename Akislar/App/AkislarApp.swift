@@ -1,4 +1,5 @@
 import SwiftUI
+import GoogleSignIn
 
 @main
 struct AkislarApp: App {
@@ -13,6 +14,9 @@ struct AkislarApp: App {
                 .environmentObject(settingsManager)
                 .environmentObject(catalogService)
                 .preferredColorScheme(.dark)
+                .onOpenURL { url in
+                    GIDSignIn.sharedInstance.handle(url)
+                }
         }
     }
 }

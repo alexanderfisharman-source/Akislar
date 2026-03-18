@@ -189,7 +189,8 @@ class CatalogService: ObservableObject {
                     "tr": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "en": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "ar": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-                ]
+                ],
+                youtubeVideoId: num == 1 ? "0fTJyCTwznM" : "0fTJyCTwznM" // Real Kuruluş Osman Ep 1
             )
         },
         "dirilis-ertugrul": (1...10).map { num in
@@ -206,7 +207,8 @@ class CatalogService: ObservableObject {
                     "tr": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "en": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "ar": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-                ]
+                ],
+                youtubeVideoId: "3yjO6yfHLcU" // Real Diriliş Ertuğrul Ep 1
             )
         },
         "payitaht-abdulhamid": (1...5).map { num in
@@ -223,7 +225,8 @@ class CatalogService: ObservableObject {
                     "tr": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "en": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "ar": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-                ]
+                ],
+                youtubeVideoId: "aqz-KE-bpKQ" // Placeholder
             )
         },
         "mehmed-fetihler-sultani": (1...5).map { num in
@@ -240,7 +243,8 @@ class CatalogService: ObservableObject {
                     "tr": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "en": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "ar": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-                ]
+                ],
+                youtubeVideoId: "aqz-KE-bpKQ" // Placeholder
             )
         },
     ]

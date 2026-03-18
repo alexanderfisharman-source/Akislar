@@ -1,5 +1,6 @@
 import SwiftUI
 import Combine
+import GoogleSignIn
 
 @MainActor
 class AuthService: ObservableObject {
@@ -92,29 +93,48 @@ class AuthService: ObservableObject {
         state = .loading
         errorMessage = nil
         
-        // Google Sign-In integration placeholder
-        // In production, use: GIDSignIn.sharedInstance.signIn(withPresenting:)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first,
+              let rootViewController = window.rootViewController else {
+            self.errorMessage = "Unable to present Google Sign-In"
+            self.state = .signedOut
+            return
+        }
+        
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { [weak self] signInResult, error in
             guard let self else { return }
             
-            let user = AppUser(
-                id: UUID().uuidString,
-                name: "Google User",
-                email: "user@gmail.com",
-                avatarURL: nil,
+            if let error = error {
+                self.errorMessage = error.localizedDescription
+                self.state = .signedOut
+                return
+            }
+            
+            guard let user = signInResult?.user, let profile = user.profile else {
+                self.errorMessage = "Failed to get user profile"
+                self.state = .signedOut
+                return
+            }
+            
+            let appUser = AppUser(
+                id: user.userID ?? UUID().uuidString,
+                name: profile.name,
+                email: profile.email,
+                avatarURL: profile.imageURL(withDimension: 100)?.absoluteString,
                 preferredStreamLanguage: StreamLanguage.english.code,
                 preferredAppLanguage: AppLanguage.english.code,
                 selectedAppIcon: "AppIcon"
             )
             
-            self.saveUser(user)
-            self.state = .signedIn(user)
+            self.saveUser(appUser)
+            self.state = .signedIn(appUser)
         }
     }
     
     // MARK: - Sign Out
     
     func signOut() {
+        GIDSignIn.sharedInstance.signOut()
         UserDefaults.standard.removeObject(forKey: "saved_user")
         state = .signedOut
     }
@@ -132,6 +152,12 @@ class AuthService: ObservableObject {
               let user = try? JSONDecoder().decode(AppUser.self, from: data) else {
             return
         }
+        
+        // If Google was used previously, try restoring it
+        GIDSignIn.sharedInstance.restorePreviousSignIn { googleUser, error in
+            // Handle silent token refresh if needed
+        }
+        
         state = .signedIn(user)
     }
 }
