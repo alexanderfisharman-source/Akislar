@@ -87,6 +87,26 @@ struct SettingsView: View {
                         }
                     }
                     
+                    // Developer Mode
+                    settingsSection(
+                        title: settingsManager.localizedString("developer_mode"),
+                        icon: "hammer.fill",
+                        iconColor: .orange
+                    ) {
+                        NavigationLink {
+                            DeveloperSettingsView()
+                        } label: {
+                            HStack {
+                                Text("Manage Sycing & Uploads")
+                                    .foregroundColor(.white)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.akislarSubtle)
+                                    .font(.caption)
+                            }
+                        }
+                    }
+                    
                     // Sign out
                     if authService.isSignedIn {
                         Button {

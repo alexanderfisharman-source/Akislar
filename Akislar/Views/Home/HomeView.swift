@@ -3,7 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var catalogService: CatalogService
     @EnvironmentObject var settingsManager: SettingsManager
-    @StateObject private var viewModel: HomeViewModel = HomeViewModel(catalogService: CatalogService())
+    @StateObject private var viewModel = HomeViewModel()
     
     var body: some View {
         NavigationStack {
@@ -43,7 +43,7 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            viewModel.loadData()
+            viewModel.setup(service: catalogService)
         }
     }
     

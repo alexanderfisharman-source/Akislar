@@ -4,6 +4,8 @@ import Foundation
 class CatalogService: ObservableObject {
     @Published var allSeries: [Series] = []
     @Published var allEpisodes: [String: [Episode]] = [:] // keyed by series ID
+    @Published var userSeries: [Series] = []
+    @Published var userEpisodes: [String: [Episode]] = [:]
     @Published var isLoading = false
     
     init() {
@@ -11,17 +13,20 @@ class CatalogService: ObservableObject {
     }
     
     var featuredSeries: [Series] {
-        allSeries.filter { $0.isFeatured }
+        let combined = allSeries + userSeries
+        return combined.filter { $0.isFeatured }
     }
     
     var trendingSeries: [Series] {
-        allSeries.sorted { $0.rating > $1.rating }
+        let combined = allSeries + userSeries
+        return combined.sorted { $0.rating > $1.rating }
     }
     
     func searchSeries(_ query: String) -> [Series] {
-        guard !query.isEmpty else { return allSeries }
+        let combined = allSeries + userSeries
+        guard !query.isEmpty else { return combined }
         let lowered = query.lowercased()
-        return allSeries.filter {
+        return combined.filter {
             $0.title.lowercased().contains(lowered) ||
             $0.originalTitle.lowercased().contains(lowered) ||
             $0.genres.contains { $0.lowercased().contains(lowered) } ||
@@ -30,11 +35,51 @@ class CatalogService: ObservableObject {
     }
     
     func episodes(for seriesId: String, season: Int? = nil) -> [Episode] {
-        let eps = allEpisodes[seriesId] ?? []
+        let eps = (allEpisodes[seriesId] ?? []) + (userEpisodes[seriesId] ?? [])
         if let season {
             return eps.filter { $0.season == season }
         }
         return eps
+    }
+    
+    func addSeries(_ series: Series) {
+        if let index = userSeries.firstIndex(where: { $0.id == series.id }) {
+            userSeries[index] = series
+        } else {
+            userSeries.append(series)
+        }
+        saveUserContent()
+    }
+    
+    func addEpisodes(for seriesId: String, episodes: [Episode]) {
+        userEpisodes[seriesId] = episodes
+        saveUserContent()
+    }
+    
+    func removeSeries(id: String) {
+        userSeries.removeAll { $0.id == id }
+        userEpisodes.removeValue(forKey: id)
+        saveUserContent()
+    }
+    
+    private func saveUserContent() {
+        if let encodedSeries = try? JSONEncoder().encode(userSeries) {
+            UserDefaults.standard.set(encodedSeries, forKey: "user_series")
+        }
+        if let encodedEpisodes = try? JSONEncoder().encode(userEpisodes) {
+            UserDefaults.standard.set(encodedEpisodes, forKey: "user_episodes")
+        }
+    }
+    
+    private func loadUserContent() {
+        if let data = UserDefaults.standard.data(forKey: "user_series"),
+           let decoded = try? JSONDecoder().decode([Series].self, from: data) {
+            userSeries = decoded
+        }
+        if let data = UserDefaults.standard.data(forKey: "user_episodes"),
+           let decoded = try? JSONDecoder().decode([String: [Episode]].self, from: data) {
+            userEpisodes = decoded
+        }
     }
     
     // MARK: - Load bundled catalog
@@ -45,6 +90,8 @@ class CatalogService: ObservableObject {
         // Bundled series data
         allSeries = Self.bundledSeries
         allEpisodes = Self.bundledEpisodes
+        
+        loadUserContent()
         
         isLoading = false
     }

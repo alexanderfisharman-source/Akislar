@@ -5,6 +5,7 @@ class SettingsManager: ObservableObject {
     @AppStorage("appLanguage") var appLanguageCode: String = AppLanguage.english.code
     @AppStorage("streamLanguage") var streamLanguageCode: String = StreamLanguage.english.code
     @AppStorage("selectedAppIcon") var selectedAppIcon: String = "AppIcon"
+    @AppStorage("youtubeApiKey") var youtubeApiKey: String = ""
     
     var appLanguage: AppLanguage {
         get { AppLanguage.allCases.first { $0.code == appLanguageCode } ?? .english }
@@ -89,6 +90,16 @@ struct LocalizedStrings {
             "synopsis": "Synopsis",
             "select_language": "Select Language",
             "no_results": "No results found",
+            "developer_mode": "Developer Mode",
+            "youtube_api_key": "YouTube API Key",
+            "playlist_id": "Playlist ID",
+            "sync_playlist": "Sync Playlist",
+            "custom_series": "Custom Series",
+            "add_series": "Add New Series",
+            "series_id": "Series ID (e.g. kurulus-osman)",
+            "poster_url": "Poster URL",
+            "syncing": "Syncing...",
+            "delete": "Delete",
         ],
         "tr": [
             "home": "Ana Sayfa",

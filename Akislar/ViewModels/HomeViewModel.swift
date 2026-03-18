@@ -7,11 +7,19 @@ class HomeViewModel: ObservableObject {
     @Published var trendingSeries: [Series] = []
     @Published var selectedFeaturedIndex = 0
     
-    private var catalogService: CatalogService
+    private var catalogService: CatalogService?
     private var timer: Timer?
     
-    init(catalogService: CatalogService) {
+    init(catalogService: CatalogService? = nil) {
         self.catalogService = catalogService
+        if catalogService != nil {
+            loadData()
+            startAutoScroll()
+        }
+    }
+    
+    func setup(service: CatalogService) {
+        self.catalogService = service
         loadData()
         startAutoScroll()
     }
