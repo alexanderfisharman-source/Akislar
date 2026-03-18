@@ -1,0 +1,74 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+    - name: Install XcodeGen
+      run: brew install xcodegen
+
+    - name: Generate Xcode project
+      run: xcodegen generate
+
+    - name: Resolve SPM dependencies
+      run: |
+        xcodebuild -resolvePackageDependencies \
+          -scheme Akislar \
+          -clonedSourcePackagesDirPath .spm
+
+    - name: Build for iOS (Unsigned)
+      run: |
+        xcodebuild build \
+          -scheme Akislar \
+          -destination 'generic/platform=iOS' \
+          -configuration Release \
+          -clonedSourcePackagesDirPath .spm \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          ONLY_ACTIVE_ARCH=NO \
+          -derivedDataPath build
+
+    - name: Create IPA
+      run: |
+        # Find the .app bundle
+        APP_PATH=$(find build -name "Akislar.app" -type d | head -1)
+        echo "Found app at: $APP_PATH"
+        
+        # Create Payload directory
+        mkdir -p output/Payload
+        cp -r "$APP_PATH" output/Payload/
+        
+        # Create IPA
+        cd output
+        zip -r ../Akislar.ipa Payload
+        cd ..
+
+    - name: Upload IPA artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Akislar-iOS
+        path: Akislar.ipa
+        retention-days: 30
+
+    - name: Upload to release (if tagged)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Akislar.ipa
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

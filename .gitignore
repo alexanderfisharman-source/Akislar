@@ -1,0 +1,10 @@
+.DS_Store
+*.xcodeproj
+*.xcworkspace
+build/
+DerivedData/
+.spm/
+*.ipa
+*.zip
+.swiftpm/
+Pods/

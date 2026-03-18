@@ -1,0 +1,50 @@
+name: Akislar
+options:
+  bundleIdPrefix: com.akislar
+  deploymentTarget:
+    iOS: "16.0"
+    macOS: "13.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGNING_ALLOWED: "NO"
+
+packages:
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: "7.0.0"
+  SDWebImageSwiftUI:
+    url: https://github.com/nicklama/SDWebImageSwiftUI
+    from: "2.2.0"
+  KeychainAccess:
+    url: https://github.com/kishikawakatsumi/KeychainAccess
+    from: "4.2.2"
+
+targets:
+  Akislar:
+    type: application
+    platform: iOS
+    sources:
+      - path: Akislar
+    resources:
+      - path: Akislar/Resources
+      - path: Akislar/Assets.xcassets
+    settings:
+      base:
+        INFOPLIST_FILE: Akislar/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.akislar.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: "YES"
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: "YES"
+    dependencies:
+      - package: GoogleSignIn
+      - package: SDWebImageSwiftUI
+      - package: KeychainAccess

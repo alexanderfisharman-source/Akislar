@@ -1,0 +1,59 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+
+    - name: Install XcodeGen
+      run: brew install xcodegen
+
+    - name: Generate Xcode project
+      run: xcodegen generate
+
+    - name: Resolve SPM dependencies
+      run: |
+        xcodebuild -resolvePackageDependencies \
+          -scheme Akislar \
+          -clonedSourcePackagesDirPath .spm
+
+    - name: Build for macOS
+      run: |
+        xcodebuild build \
+          -scheme Akislar \
+          -destination 'platform=macOS,arch=arm64' \
+          -configuration Release \
+          -clonedSourcePackagesDirPath .spm \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          -derivedDataPath build
+
+    - name: Package macOS app
+      run: |
+        APP_PATH=$(find build -name "Akislar.app" -type d | head -1)
+        mkdir -p output
+        cp -r "$APP_PATH" output/
+        cd output
+        zip -r ../Akislar-macOS.zip Akislar.app
+        cd ..
+
+    - name: Upload macOS artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Akislar-macOS
+        path: Akislar-macOS.zip
+        retention-days: 30
