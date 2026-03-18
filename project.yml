@@ -22,8 +22,8 @@ packages:
     url: https://github.com/google/GoogleSignIn-iOS
     from: "7.0.0"
   SDWebImageSwiftUI:
-    url: https://github.com/nicklama/SDWebImageSwiftUI
-    from: "2.2.0"
+    url: https://github.com/SDWebImage/SDWebImageSwiftUI
+    from: "3.0.0"
   KeychainAccess:
     url: https://github.com/kishikawakatsumi/KeychainAccess
     from: "4.2.2"
