@@ -13,6 +13,7 @@ class PlayerViewModel: ObservableObject {
     @Published var selectedStreamLanguage: StreamLanguage
     @Published var showLanguagePicker = false
     
+    private var hideControlsTimer: Timer?
     let episode: Episode
     init(episode: Episode, preferredLanguage: StreamLanguage) {
         self.episode = episode
