@@ -74,12 +74,14 @@
             </dict>
         </dict>
     </dict>
+    <key>GIDClientID</key>
+    <string>690407940686-ib4q5c6fbu7956bjqlc6kaelm40m5jdl.apps.googleusercontent.com</string>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>com.googleusercontent.apps.YOUR_CLIENT_ID</string>
+                <string>com.googleusercontent.apps.690407940686-ib4q5c6fbu7956bjqlc6kaelm40m5jdl</string>
             </array>
         </dict>
     </array>
