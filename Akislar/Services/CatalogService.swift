@@ -190,7 +190,7 @@ class CatalogService: ObservableObject {
                     "en": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
                     "ar": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
                 ],
-                youtubeVideoId: num == 1 ? "0fTJyCTwznM" : "0fTJyCTwznM" // Real Kuruluş Osman Ep 1
+                youtubeVideoId: "ugLGoSZvuOc" // Real Kuruluş Osman Ep 1 (Embed allowed)
             )
         },
         "dirilis-ertugrul": (1...10).map { num in

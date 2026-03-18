@@ -73,7 +73,9 @@ struct YouTubePlayerBridge: UIViewRepresentable {
                             'showinfo': 0,
                             'fs': 0,
                             'disablekb': 1,
-                            'iv_load_policy': 3
+                            'iv_load_policy': 3,
+                            'origin': 'https://www.youtube.com',
+                            'enablejsapi': 1
                         },
                         events: {
                             'onReady': onPlayerReady,

@@ -27,11 +27,11 @@ jobs:
           -scheme Akislar \
           -clonedSourcePackagesDirPath .spm
 
-    - name: Build for macOS
+    - name: Build for macOS (Catalyst)
       run: |
         xcodebuild build \
           -scheme Akislar \
-          -destination 'platform=macOS,arch=arm64' \
+          -destination 'platform=macOS,variant=Mac Catalyst' \
           -configuration Release \
           -clonedSourcePackagesDirPath .spm \
           CODE_SIGN_IDENTITY="" \
